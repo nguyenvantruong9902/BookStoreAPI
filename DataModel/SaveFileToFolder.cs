@@ -39,7 +39,7 @@ namespace DataModel
             var maxImageHeight = 800;
             MemoryStream ms = new MemoryStream(content);
             Image img = Image.FromStream(ms);
-            if (img.Width > 800 || img.Height > 800)
+            if (img.Width > maxImageWidth || img.Height > maxImageHeight)
             {
                 var ratioX = (double)maxImageWidth / img.Width;
                 var ratioY = (double)maxImageHeight / img.Height;
