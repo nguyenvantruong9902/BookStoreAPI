@@ -15,11 +15,6 @@ namespace BookStoreAPI
     {
         protected void Application_Start()
         {
-            using(var ctx = new BookStoreContext())
-            {
-                ctx.Books.AddRange(DataFactory.ListBook(ctx.Authors.ToList()));
-                ctx.SaveChanges();
-            }
             AreaRegistration.RegisterAllAreas();
             GlobalConfiguration.Configure(WebApiConfig.Register);
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);

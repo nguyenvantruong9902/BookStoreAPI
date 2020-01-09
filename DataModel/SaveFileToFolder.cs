@@ -14,46 +14,48 @@ namespace DataModel
 {
     public class SaveFileToFolder
     {
-        public static string SaveImage(string fileName)
+        public static string SaveImage(byte[] content, string originFileName)
         {
-            var path = Path.Combine(@"C:\Users\HP\Desktop\Trash", fileName);
-            var imagePath = ConfigurationManager.AppSettings["CoverUrl"];
-            var physicalPath = HttpContext.Current.Server.MapPath(imagePath);
-            Directory.CreateDirectory(physicalPath);
-            string guid = Guid.NewGuid().ToString();
-            return CheckImage(path, guid, physicalPath);
+            Directory.CreateDirectory(GetImageFolder());
+            var newFileName = $"{Guid.NewGuid()}.{Path.GetExtension(originFileName)}";
+            CheckImage(content, newFileName, GetImageFolder());
+            return newFileName;
         }
 
-        private static string CheckImage(string fileName, string guid, string physicalPath)
+        public static string GetImageFolder()
         {
-            using (var img = new Bitmap(fileName))
+            var imagePath = ConfigurationManager.AppSettings["CoverUrl"];
+            var physicalPath = HttpContext.Current.Server.MapPath(imagePath);
+            if (Directory.Exists(imagePath))
             {
-                if (img.Width > 800 || img.Height > 800)
-                {
-                    var destRect = new Rectangle(0, 0, 800, 800);
-                    var destImage = new Bitmap(800, 800);
-                    destImage.SetResolution(img.HorizontalResolution, img.VerticalResolution);
-                    using (var graphics = Graphics.FromImage(destImage))
-                    {
-                        graphics.CompositingMode = CompositingMode.SourceCopy;
-                        graphics.CompositingQuality = CompositingQuality.HighQuality;
-                        graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                        graphics.SmoothingMode = SmoothingMode.HighQuality;
-                        graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
-                        using (var wrapMode = new ImageAttributes())
-                        {
-                            wrapMode.SetWrapMode(WrapMode.TileFlipXY);
-                            graphics.DrawImage(img, destRect, 0, 0, img.Width, img.Height, GraphicsUnit.Pixel, wrapMode);
-                        }
-                    }
-                    destImage.Save(Path.Combine(physicalPath, guid + Path.GetExtension(fileName)));
-                    return guid + Path.GetExtension(fileName);
-                }
-                else
-                {
-                    File.Copy(fileName, Path.Combine(physicalPath, guid + Path.GetExtension(fileName)), true);
-                    return guid + Path.GetExtension(fileName);
-                }
+                Directory.CreateDirectory(physicalPath);
+            }
+            return physicalPath;
+        }
+
+        public static void CheckImage(byte[] content, string newFileName, string physicalPath)
+        {
+            var maxImageWidth = 800;
+            var maxImageHeight = 800;
+            MemoryStream ms = new MemoryStream(content);
+            Image img = Image.FromStream(ms);
+            if (img.Width > 800 || img.Height > 800)
+            {
+                var ratioX = (double)maxImageWidth / img.Width;
+                var ratioY = (double)maxImageHeight / img.Height;
+                var ratio = Math.Min(ratioX, ratioY);
+
+                var newWidth = (int)(img.Width * ratio);
+                var newHeight = (int)(img.Height * ratio);
+
+                var newImage = new Bitmap(newWidth, newHeight);
+                using (var graphics = Graphics.FromImage(newImage))
+                    graphics.DrawImage(img, 0, 0, newWidth, newHeight);
+                newImage.Save(Path.Combine(physicalPath, newFileName));
+            }
+            else
+            {
+                img.Save(Path.Combine(physicalPath, newFileName));
             }
         }
     }
