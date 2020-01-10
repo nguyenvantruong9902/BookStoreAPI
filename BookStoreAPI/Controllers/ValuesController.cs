@@ -1,8 +1,7 @@
-﻿using System;
+﻿using DataModel;
+using DataModel.Models;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Web.Http;
 
 namespace BookStoreAPI.Controllers
@@ -10,9 +9,12 @@ namespace BookStoreAPI.Controllers
     public class ValuesController : ApiController
     {
         // GET api/values
-        public IEnumerable<string> Get()
+        public IEnumerable<Author> Get()
         {
-            return new string[] { "value1", "value2" };
+            using(var ctx = new BookStoreContext())
+            {
+                return ctx.Authors.ToList();
+            }
         }
 
         // GET api/values/5
