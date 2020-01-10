@@ -58,6 +58,7 @@
   <ItemGroup>
     <Compile Include="BookStoreContext.cs" />
     <Compile Include="DataFactory.cs" />
+    <Compile Include="ImageService.cs" />
     <Compile Include="Migrations\202001070327181_Init.cs" />
     <Compile Include="Migrations\202001070327181_Init.designer.cs">
       <DependentUpon>202001070327181_Init.cs</DependentUpon>
@@ -72,7 +73,6 @@
     <Compile Include="Models\Book.cs" />
     <Compile Include="Models\Category.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SaveFileToFolder.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
